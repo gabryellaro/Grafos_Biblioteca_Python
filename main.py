@@ -1,44 +1,41 @@
-from grafo import *
-g = Grafo()
-if g.ler_arquivo("teste.gr"):
-    print("Arquivo lido com sucesso!")
-    print("Número de vértices:", g.n())
-    print("Número de arestas:", g.m())
-    print("Vizinhança do vértice v:", g.viz('2'))
-    print("Grau do vértice v:", g.d('2'))
-    print("Peso da aresta uv:", g.w(('27', '28')))
-    print("Menor grau no grafo:", g.mind())
-    print("Maior grafo no grafo:", g.maxd())
-else:
-    print("Falha ao ler o arquivo.")
+from grafo import DiGrafo
+
+def menu_digrafo(g):
+    while True:
+        print("1. Obter número de vértices e arestas")
+        print("2. Obter vizinhança de um vértice")
+        print("3. Obter grau de um vértice")
+        print("4. Obter peso de uma aresta")
+        print("5. Obter menor grau do grafo")
+        print("6. Obter maior grau do grafo")
+        opcao = input("Escolha uma opção: ")
+        if opcao == "1":
+            print(g.num_vertices())
+            print(g.num_arestas())
+        elif opcao == "2":
+            v = input("Digite o vértice: ")
+            print(g.vizinhanca(v))
+        elif opcao == "3":
+            v = input("Digite o vértice: ")
+            print(g.grau_vertice(v))
+        elif opcao == "4":
+            uv = input("Digite a aresta no formato 'u v': ").split()
+            print(g.peso_aresta(uv))
+        elif opcao == "5":
+            print(g.menor_grau())
+        elif opcao == "6":
+            print(g.maior_grau())
+        elif opcao == "0":
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
+
 def main():
-    g = Grafo()
-    if g.ler_arquivo('arquivo.gr'):
-        print("Arquivo lido com sucesso!")
-        print("Número de vértices:", g.n())
-        print("Número de arestas:", g.m())
-        print("Vizinhança do vértice v:", g.viz('v'))
-        print("Grau do vértice v:", g.d('v'))
-        print("Peso da aresta uv:", g.w(('u', 'v')))
-        print("Menor grau no grafo:", g.mind())
-        print("Maior grafo no grafo:", g.maxd())
-
-        v = 'v'  # Substitua 'v' pelo vértice de origem desejado
-        distancia, predecessor = g.bfs(v)
-        print(f"Distâncias a partir de {v}:", distancia)
-        print(f"Predecessores a partir de {v}:", predecessor)
-
-        predecessor, tempo_inicio, tempo_fim = g.dfs(v)
-        print(f"Tempos de início da visita a partir de {v}:", tempo_inicio)
-        print(f"Tempos de término da visita a partir de {v}:", tempo_fim)
-
-        distancia, predecessor = g.bf(v)
-        print(f"Distâncias mínimas a partir de {v} (Bellman-Ford):", distancia)
-
-        distancia, predecessor = g.dijkstra(v)
-        print(f"Distâncias mínimas a partir de {v} (Dijkstra):", distancia)
-    else:
-        print("Falha ao ler o arquivo.")
+    g = DiGrafo()
+    nome_arquivo='USA-road-d.NY.gr'
+    g.ler_arquivo(nome_arquivo)
+    g.obter_grafo()
+    menu_digrafo(g)
 
 if __name__ == "__main__":
     main()

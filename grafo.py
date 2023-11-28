@@ -132,3 +132,61 @@ class Grafo:
                     heapq.heappush(fila_prioridade, (dist_v, vizinho))
 
         return distancia, predecessor
+
+class DiGrafo:
+    def __init__(self):
+        self.grafo = {}
+        self.m = 0
+        self.min_d = float('inf')
+        self.max_d = 0
+
+    def adicionar_aresta(self, inicio, fim, peso):
+        if inicio not in self.grafo:
+            self.grafo[inicio] = {}
+        # Define a direção com base na ordem dos vértices
+        direcao = 'positivo' if inicio < fim else 'negativo'
+        self.grafo[inicio][fim] = (int(peso), direcao)
+        self.m += 1
+        self.min_d = min(self.min_d, len(self.grafo[inicio]))
+        self.max_d = max(self.max_d, len(self.grafo[inicio]))
+
+    def ler_arquivo(self, nome_arquivo):
+        with open(nome_arquivo, 'r') as arquivo:
+            for _ in range(6):
+                next(arquivo)
+            for linha in arquivo:
+                dados = linha.split()
+                if len(dados) >= 4 and dados[0] == 'a':
+                    self.adicionar_aresta(dados[1], dados[2], int(dados[3]))
+
+    def aresta_positiva(self, inicio, fim):
+        return inicio in self.grafo and fim in self.grafo[inicio] and self.grafo[inicio][fim][1] == 'a'
+
+    def obter_grafo(self):
+        for inicio in self.grafo:
+            for fim in self.grafo[inicio]:
+                peso, direcao = self.grafo[inicio][fim]
+                print(f"Aresta de {inicio} para {fim} com peso {peso} e direção {direcao}")
+        return self.grafo
+
+    def num_arestas(self):
+        return len(self.grafo)
+
+    def num_vertices(self):
+        return self.m
+
+    def vizinhanca(self, v):
+        return set(self.grafo[v].keys()) if v in self.grafo else set()
+
+    def grau_vertice(self, v):
+        return len(self.grafo[v]) if v in self.grafo else 0
+
+    def peso_aresta(self, uv):
+        u, v = uv
+        return self.grafo[u][v][0] if u in self.grafo and v in self.grafo[u] else None
+
+    def menor_grau(self):
+        return self.min_d
+
+    def maior_grau(self):
+        return self.max_d  # Retorna o maior grau presente no grafo
