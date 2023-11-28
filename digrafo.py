@@ -1,7 +1,7 @@
 from collections import deque, defaultdict
 import heapq
 
-class DidiGrafo:
+class Digrafo:
     def __init__(self):
         """Inicializa um digrafo direcionado vazio,
         o número de arcos como 0 e os graus mínimo e máximo
@@ -11,39 +11,44 @@ class DidiGrafo:
         self.min_d = float('inf')
         self.max_d = 0
 
-    def adicionar_arco(self, inicio, fim, peso):
+    def adicionar_arco(self, origem, destino, peso):
         """Adiciona um arco ao digrafo com um peso e uma direção
-        (positiva se 'inicio' < 'fim', negativa caso contrário).
+        (positiva se 'origem' < 'destino', negativa caso contrário).
         Atualiza o número de arcos e os graus mínimo e máximo."""
-        if inicio not in self.digrafo:
-            self.digrafo[inicio] = {}
+        if origem not in self.digrafo:
+            self.digrafo[origem] = {}
         # Define a direção com base na ordem dos vértices
-        direcao = 'positivo' if inicio < fim else 'negativo'
-        self.digrafo[inicio][fim] = (int(peso), direcao)
+        direcao = 'positivo' if origem < destino else 'negativo'
+        self.digrafo[origem][destino] = (int(peso), direcao)
         self.m += 1
-        self.min_d = min(self.min_d, len(self.digrafo[inicio]))
-        self.max_d = max(self.max_d, len(self.digrafo[inicio]))
+        self.min_d = min(self.min_d, len(self.digrafo[origem]))
+        self.max_d = max(self.max_d, len(self.digrafo[origem]))
 
     def ler_arquivo(self, nome_arquivo):
         # Lê um arquivo de texto que contém os arcos do digrafo e os adiciona ao grafo.
-        with open(nome_arquivo, 'r') as arquivo:
-            for _ in range(6):
-                next(arquivo)
-            for linha in arquivo:
-                dados = linha.split()
-                if len(dados) >= 4 and dados[0] == 'a':
-                    self.adicionar_arco(dados[1], dados[2], int(dados[3]))
+        try:
+            with open(nome_arquivo, 'r') as arquivo:
+                for _ in range(6):
+                    next(arquivo)
+                for linha in arquivo:
+                    dados = linha.split()
+                    if len(dados) >= 4 and dados[0] == 'a':
+                        self.adicionar_arco(dados[1], dados[2], int(dados[3]))
+            return True
+        except Exception as e:
+            print(f"Ocorreu um erro ao ler o arquivo: {e}")
+            return False
 
-    def aresta_positiva(self, inicio, fim):
-        # Verifica se o arco de 'inicio' para 'fim' existe e é positivo.
-        return inicio in self.digrafo and fim in self.digrafo[inicio] and self.digrafo[inicio][fim][1] == 'a'
+    def aresta_positiva(self, origem, destino):
+        # Verifica se o arco de 'origem' para 'destino' existe e é positivo.
+        return origem in self.digrafo and destino in self.digrafo[origem] and self.digrafo[origem][destino][1] == 'a'
 
     def obter_digrafo(self):
         # Imprime todos os arcos do grafo com seus pesos e direções e retorna o digrafo.
-        for inicio in self.digrafo:
-            for fim in self.digrafo[inicio]:
-                peso, direcao = self.digrafo[inicio][fim]
-                print(f"Aresta de {inicio} para {fim} com peso {peso} e direção {direcao}")
+        for origem in self.digrafo:
+            for destino in self.digrafo[origem]:
+                peso, direcao = self.digrafo[origem][destino]
+                print(f"Aresta de {origem} para {destino} com peso {peso} e direção {direcao}")
         return self.digrafo
 
     def num_arestas(self):
@@ -98,38 +103,38 @@ class DidiGrafo:
 
         return distancia, predecessor
 
-    def dfs_visita(self, v, visitado, predecessor, tempo_inicio, tempo_fim, tempo):
+    def dfs_visita(self, v, visitado, predecessor, tempo_origem, tempo_destino, tempo):
         """Função auxiliar para a busca em profundidade (Depth-First Search - DFS).
            Visita recursivamente todos os vértices do digrafo."""
         visitado[v] = True
         tempo += 1
-        tempo_inicio[v] = tempo
+        tempo_origem[v] = tempo
 
         for vizinho in self.digrafo[v]:
             if not visitado[vizinho]:
                 predecessor[vizinho] = v
-                tempo = self.dfs_visitaa(vizinho, visitado, predecessor, tempo_inicio, tempo_fim, tempo)
+                tempo = self.dfs_visita(vizinho, visitado, predecessor, tempo_origem, tempo_destino, tempo)
 
         tempo += 1
-        tempo_fim[v] = tempo
+        tempo_destino[v] = tempo
 
         return tempo
 
     def dfs(self, v):
         """Realiza uma busca em profundidade (Depth-First Search - DFS) a partir do vértice v.
         Retorna três dicionários: 'predecessor', que contém o predecessor de cada vértice na árvore de busca,
-        e 'tempo_inicio' e 'tempo_fim', que contêm os tempos de início e fim da visita a cada vértice, respectivamente."""
+        e 'tempo_origem' e 'tempo_destino', que contêm os tempos de início e destino da visita a cada vértice, respectivamente."""
         visitado = {x: False for x in self.digrafo}
         predecessor = {x: None for x in self.digrafo}
-        tempo_inicio = {x: float('inf') for x in self.digrafo}
-        tempo_fim = {x: float('inf') for x in self.digrafo}
+        tempo_origem = {x: float('inf') for x in self.digrafo}
+        tempo_destino = {x: float('inf') for x in self.digrafo}
 
         tempo = 0
         for vertice in self.digrafo:
             if not visitado[vertice]:
-                tempo = self.dfs_visitaa(vertice, visitado, predecessor, tempo_inicio, tempo_fim, tempo)
+                tempo = self.dfs_visita(vertice, visitado, predecessor, tempo_origem, tempo_destino, tempo)
 
-        return predecessor, tempo_inicio, tempo_fim
+        return predecessor, tempo_origem, tempo_destino
 
     def bellman_ford(self, v):
         """Implementa o algoritmo de Bellman-Ford a partir do vértice v.

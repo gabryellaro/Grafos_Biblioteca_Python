@@ -14,20 +14,16 @@ class Grafo:
            onde a chave é o vértice de destino e o valor é o peso."""
         self.grafo[origem][destino] = int(peso)
 
-    def ler_arquivo(self, arquivo):
-        """Lê um arquivo de texto que contém as arestas do grafo.
-           Cada linha do arquivo representa uma aresta e é composta por três partes:
-           origem, destino e peso."""
+    def ler_arquivo(self, nome_arquivo):
+        # Lê um arquivo de texto que contém os arcos do digrafo e os adiciona ao grafo.
         try:
-            with open(arquivo, 'r') as f:
-                linhas = f.readlines()[7:]
-                for linha in linhas:
-                    partes = linha.split()
-                    if partes[0] == 'a':
-                        origem = partes[1]
-                        destino = partes[2]
-                        peso = partes[3]
-                        self.adicionar_arco(origem, destino, peso)
+            with open(nome_arquivo, 'r') as arquivo:
+                for _ in range(6):
+                    next(arquivo)
+                for linha in arquivo:
+                    dados = linha.split()
+                    if len(dados) >= 4 and dados[0] == 'a':
+                        self.adicionar_arco(dados[1], dados[2], int(dados[3]))
             return True
         except Exception as e:
             print(f"Ocorreu um erro ao ler o arquivo: {e}")
