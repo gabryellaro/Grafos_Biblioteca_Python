@@ -1,6 +1,5 @@
 from collections import deque, defaultdict
 import heapq
-import sys
 
 class Grafo:
     def __init__(self):
