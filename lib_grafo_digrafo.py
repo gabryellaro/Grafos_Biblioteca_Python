@@ -55,7 +55,7 @@ def menu_grafo(g):
             print(g.bellman_ford(v))
         elif opcao=='12':
             v = input("Digite o vértice de origem para Djikstra: ")
-            print(g.djikstra(v))
+            print(g.dijkstra(v))
         elif opcao=='13':
             print(g.obter_grafo())
         else:
@@ -115,7 +115,7 @@ def menu_digrafo(d):
             print(d.bellman_ford(v))
         elif opcao=='12':
             v = input("Digite o vértice de origem para Djikstra: ")
-            print(d.djikstra(v))
+            print(d.dijkstra(v))
         elif opcao=='13':
             print(d.obter_digrafo())
         else:

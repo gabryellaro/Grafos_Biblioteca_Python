@@ -1,4 +1,4 @@
-from collections import deque, defaultdict
+from collections import deque
 import heapq
 
 class Digrafo:
@@ -81,96 +81,105 @@ class Digrafo:
         return self.max_d
     
     def bfs(self, v):
-        """Realiza uma busca em largura (Breadth-First Search - BFS) a partir do vértice v.
-        Retorna dois dicionários: 'distancia', que contém a distância de v a cada vértice,
-        e 'predecessor', que contém o predecessor de cada vértice na árvore de busca."""
         visitado = {x: False for x in self.digrafo}
         distancia = {x: float('inf') for x in self.digrafo}
         predecessor = {x: None for x in self.digrafo}
 
-        fila = deque([v])
+        fila = deque()
+        fila.append(v)
         visitado[v] = True
         distancia[v] = 0
 
         while fila:
-            u = fila.popleft()
-            for vizinho in self.digrafo[u]:
+            vertice = fila.popleft()
+            for vizinho in self.digrafo[vertice]:
                 if not visitado[vizinho]:
                     fila.append(vizinho)
                     visitado[vizinho] = True
-                    distancia[vizinho] = distancia[u] + 1
-                    predecessor[vizinho] = u
+                    distancia[vizinho] = distancia[vertice] + 1
+                    predecessor[vizinho] = vertice
+
+        # Filtrar os resultados infinito e None
+        distancia = {k: v for k, v in distancia.items() if v != float('inf')}
+        predecessor = {k: v for k, v in predecessor.items() if v is not None}
 
         return distancia, predecessor
 
-    def dfs_visita(self, v, visitado, predecessor, tempo_origem, tempo_destino, tempo):
-        """Função auxiliar para a busca em profundidade (Depth-First Search - DFS).
-           Visita recursivamente todos os vértices do digrafo."""
-        visitado[v] = True
-        tempo += 1
-        tempo_origem[v] = tempo
-
-        for vizinho in self.digrafo[v]:
-            if not visitado[vizinho]:
-                predecessor[vizinho] = v
-                tempo = self.dfs_visita(vizinho, visitado, predecessor, tempo_origem, tempo_destino, tempo)
-
-        tempo += 1
-        tempo_destino[v] = tempo
-
-        return tempo
-
     def dfs(self, v):
-        """Realiza uma busca em profundidade (Depth-First Search - DFS) a partir do vértice v.
-        Retorna três dicionários: 'predecessor', que contém o predecessor de cada vértice na árvore de busca,
-        e 'tempo_origem' e 'tempo_destino', que contêm os tempos de início e destino da visita a cada vértice, respectivamente."""
         visitado = {x: False for x in self.digrafo}
         predecessor = {x: None for x in self.digrafo}
-        tempo_origem = {x: float('inf') for x in self.digrafo}
-        tempo_destino = {x: float('inf') for x in self.digrafo}
+        tempo_inicio = {x: None for x in self.digrafo}
+        tempo_fim = {x: None for x in self.digrafo}
 
-        tempo = 0
-        for vertice in self.digrafo:
-            if not visitado[vertice]:
-                tempo = self.dfs_visita(vertice, visitado, predecessor, tempo_origem, tempo_destino, tempo)
+        tempo = [0]  # Usamos uma lista para que o valor seja passado por referência
 
-        return predecessor, tempo_origem, tempo_destino
+        def dfs_visit(vertice):
+            visitado[vertice] = True
+            tempo[0] += 1
+            tempo_inicio[vertice] = tempo[0]
+
+            for vizinho in self.digrafo[vertice]:
+                if not visitado[vizinho]:
+                    predecessor[vizinho] = vertice
+                    dfs_visit(vizinho)
+
+            tempo[0] += 1
+            tempo_fim[vertice] = tempo[0]
+
+        dfs_visit(v)
+
+        # Filtrar os resultados None
+        predecessor = {k: v for k, v in predecessor.items() if v is not None}
+        tempo_inicio = {k: v for k, v in tempo_inicio.items() if v is not None}
+        tempo_fim = {k: v for k, v in tempo_fim.items() if v is not None}
+
+        return predecessor, tempo_inicio, tempo_fim
 
     def bellman_ford(self, v):
-        """Implementa o algoritmo de Bellman-Ford a partir do vértice v.
-        Retorna dois dicionários: 'distancia', que contém a distância de v a cada vértice,
-        e 'predecessor', que contém o predecessor de cada vértice no caminho mínimo."""
         distancia = {x: float('inf') for x in self.digrafo}
         predecessor = {x: None for x in self.digrafo}
+
         distancia[v] = 0
 
         for _ in range(len(self.digrafo) - 1):
-            for u in self.digrafo:
-                for vizinho, (peso, direcao) in self.digrafo[u].items():
-                    if distancia[u] + peso < distancia[vizinho]:
-                        distancia[vizinho] = distancia[u] + peso
-                        predecessor[vizinho] = u
+            for vertice in self.digrafo:
+                for vizinho, (peso, _) in self.digrafo[vertice].items():
+                    if distancia[vertice] + peso < distancia[vizinho]:
+                        distancia[vizinho] = distancia[vertice] + peso
+                        predecessor[vizinho] = vertice
+
+        for vertice in self.digrafo:
+            for vizinho, (peso, _) in self.digrafo[vertice].items():
+                if distancia[vertice] + peso < distancia[vizinho]:
+                    print("O digrafo contém um ciclo de peso negativo")
+                    return None, None
+
+        # Filtrar os resultados infinito e None
+        distancia = {k: v for k, v in distancia.items() if v != float('inf')}
+        predecessor = {k: v for k, v in predecessor.items() if v is not None}
 
         return distancia, predecessor
 
-    def djikstra(self, v):
-        """Implementa o algoritmo de Djikstra a partir do vértice v.
-        Retorna dois dicionários: 'distancia', que contém a distância de v a cada vértice,
-        e 'predecessor', que contém o predecessor de cada vértice no caminho mínimo."""
+    def dijkstra(self, v):
         distancia = {x: float('inf') for x in self.digrafo}
         predecessor = {x: None for x in self.digrafo}
-        distancia[v] = 0
 
+        distancia[v] = 0
         fila_prioridade = [(0, v)]
+
         while fila_prioridade:
-            dist_u, u = heapq.heappop(fila_prioridade)
-            if dist_u != distancia[u]:
+            dist, vertice = heapq.heappop(fila_prioridade)
+            if dist != distancia[vertice]:
                 continue
-            for vizinho, (peso, direcao) in self.digrafo[u].items():
-                alternativa = distancia[u] + peso
-                if alternativa < distancia[vizinho]:
-                    distancia[vizinho] = alternativa
-                    predecessor[vizinho] = u
-                    heapq.heappush(fila_prioridade, (alternativa, vizinho))
+            for vizinho, (peso, _) in self.digrafo[vertice].items():
+                distancia_alternativa = distancia[vertice] + peso
+                if distancia_alternativa < distancia[vizinho]:
+                    distancia[vizinho] = distancia_alternativa
+                    predecessor[vizinho] = vertice
+                    heapq.heappush(fila_prioridade, (distancia_alternativa, vizinho))
+
+        # Filtrar os resultados infinito e None
+        distancia = {k: v for k, v in distancia.items() if v != float('inf')}
+        predecessor = {k: v for k, v in predecessor.items() if v is not None}
 
         return distancia, predecessor
