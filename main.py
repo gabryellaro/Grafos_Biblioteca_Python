@@ -6,9 +6,9 @@ def main():
     d = Digrafo()
     while True:
         print("============================================")
-        print("Voce deseja trabalhar com o arquivo como um:")
-        print("1.Grafo")
-        print("2.Digrafo")
+        print("1.Operações como Grafo")
+        print("2.Operações como Digrafo")
+        print("3.Resultado dos testes")
         print("============================================")
         opcao= input("Escolha uma opção: ")
         if opcao =='1':
@@ -18,6 +18,10 @@ def main():
         elif opcao =='2':
             if d.ler_arquivo(nome_arquivo):
                 menu_digrafo(d)
+            break
+        elif opcao=='3':
+            if d.ler_arquivo(nome_arquivo):
+                d.testes(nome_arquivo)
             break
         else:
             print("Opção Inválida!")

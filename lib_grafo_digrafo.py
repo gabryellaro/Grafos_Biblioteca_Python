@@ -120,3 +120,39 @@ def menu_digrafo(d):
             print(d.obter_digrafo())
         else:
             print("Opção Inválida!")
+
+
+#ta com erro
+def testes(d):
+        # a) Valor de G.mind
+        mind = d.menor_grau()
+        print(f'a) Valor de G.mind: {mind}')
+
+        # b) Valor de G.maxd
+        maxd = d.maior_grau()
+        print(f'b) Valor de G.maxd: {maxd}')
+
+        # c) Caminho com uma quantidade de arestas maior ou igual a 10
+        caminho_10 = None
+        for vertice in d.digrafo:
+            if d.grau_vertice(vertice) >= 10:
+                caminho_10 = d.bfs(vertice)
+                break
+        print(f'c) Caminho com uma quantidade de arestas maior ou igual a 10: {caminho_10}')
+
+        # d) Ciclo com uma quantidade de arestas maior ou igual a 5
+        ciclo_5 = None
+        for vertice in d.digrafo:
+            if d.grau_vertice(vertice) >= 5:
+                ciclo_5 = d.dfs(vertice)
+                break
+        print(f'd) Ciclo com uma quantidade de arestas maior ou igual a 5: {ciclo_5}')
+
+        # e) Vértice mais distante do vértice 129 e a distância entre eles
+        print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+        print("Aguarde o fim dos testes, pode demorar um tempo...")
+        print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+        distancias_129, _ = d.dijkstra(129)
+        vertice_distante = max(distancias_129, key=distancias_129.get)
+        distancia_vertice_distante = distancias_129[vertice_distante]
+        print(f'e) Vértice mais distante do vértice 129: {vertice_distante}, Distância: {distancia_vertice_distante}')

@@ -81,25 +81,33 @@ class Digrafo:
         return self.max_d
     
     def bfs(self, v):
+        """Executa a busca em largura a partir do vértice v."""
         if v not in self.digrafo:
-            print("Vértice não encontrado no digrafo.")
+            print(f"O vértice {v} não está presente no digrafo.")
             return None
 
+        # Inicializa listas para armazenar distâncias e predecessores
         d = {vertice: float('inf') for vertice in self.digrafo}
         pi = {vertice: None for vertice in self.digrafo}
+
+        # Marca o vértice de origem como visitado
         d[v] = 0
+
+        # Fila para rastrear os vértices a serem visitados
         fila = deque([v])
 
         while fila:
             atual = fila.popleft()
-            for vizinho in self.digrafo[atual]:
+
+            for vizinho in self.vizinhanca(atual):
                 if d[vizinho] == float('inf'):
+                    # Se o vizinho ainda não foi visitado
                     d[vizinho] = d[atual] + 1
                     pi[vizinho] = atual
                     fila.append(vizinho)
 
         return d, pi
-
+    
     def dfs(self, vertice):
         pi = {v: None for v in self.digrafo}
         v_ini = {v: None for v in self.digrafo}
@@ -131,44 +139,67 @@ class Digrafo:
         return pi, v_ini, v_fim
 
     def bellman_ford(self, v):
+        """Executa o algoritmo de Bellman-Ford a partir do vértice v."""
+        if v not in self.digrafo:
+            print(f"O vértice {v} não está presente no digrafo.")
+            return None
+
+        # Inicializa listas para armazenar distâncias e predecessores
         d = {vertice: float('inf') for vertice in self.digrafo}
         pi = {vertice: None for vertice in self.digrafo}
+
+        # Marca o vértice de origem como visitado
         d[v] = 0
 
-        for _ in range(len(self.digrafo) - 1):
+        # Relaxa todas as arestas repetidamente |V| - 1 vezes
+        for _ in range(self.num_vertices() - 1):
             for origem in self.digrafo:
                 for destino in self.digrafo[origem]:
-                    if d[origem] + self.digrafo[origem][destino][0] < d[destino]:
-                        d[destino] = d[origem] + self.digrafo[origem][destino][0]
+                    peso, _ = self.digrafo[origem][destino]
+                    if d[origem] + peso < d[destino]:
+                        d[destino] = d[origem] + peso
                         pi[destino] = origem
 
+        # Verifica ciclos negativos
         for origem in self.digrafo:
             for destino in self.digrafo[origem]:
-                if d[origem] + self.digrafo[origem][destino][0] < d[destino]:
-                    raise ValueError("O digrafo contém um ciclo negativo")
+                peso, _ = self.digrafo[origem][destino]
+                if d[origem] + peso < d[destino]:
+                    print("O grafo contém um ciclo negativo.")
+                    return None
 
         return d, pi
 
-    def dijkstra(self, origem):
-        distancias = {v: float('inf') for v in self.digrafo}
-        predecessores = {v: None for v in self.digrafo}
-        distancias[origem] = 0
+    def dijkstra(self, v):
+        """Executa o algoritmo de Dijkstra a partir do vértice v."""
+        if v not in self.digrafo:
+            print(f"O vértice {v} não está presente no digrafo.")
+            return None
 
-        heap = [(0, origem)]
+        # Inicializa listas para armazenar distâncias e predecessores
+        d = {vertice: float('inf') for vertice in self.digrafo}
+        pi = {vertice: None for vertice in self.digrafo}
 
-        while heap:
-            dist_u, u = heapq.heappop(heap)
+        # Marca o vértice de origem como visitado
+        d[v] = 0
 
-            if dist_u > distancias[u]:
+        # Fila de prioridade para processar vértices com menor distância primeiro
+        fila_prioridade = [(0, v)]
+
+        while fila_prioridade:
+            dist_atual, atual = heapq.heappop(fila_prioridade)
+
+            if dist_atual > d[atual]:
+                # Ignora processamento se a distância atual já não é a menor
                 continue
 
-            for v in self.digrafo[u]:
-                peso_uv, _ = self.digrafo[u][v]
-                dist_v = distancias[u] + peso_uv
+            for vizinho in self.vizinhanca(atual):
+                peso, _ = self.digrafo[atual][vizinho]
 
-                if dist_v < distancias[v]:
-                    distancias[v] = dist_v
-                    predecessores[v] = u
-                    heapq.heappush(heap, (dist_v, v))
+                if d[atual] + peso < d[vizinho]:
+                    # Relaxa a aresta se encontrar um caminho mais curto
+                    d[vizinho] = d[atual] + peso
+                    pi[vizinho] = atual
+                    heapq.heappush(fila_prioridade, (d[vizinho], vizinho))
 
-        return distancias, predecessores
+        return d, pi
