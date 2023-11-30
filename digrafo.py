@@ -81,105 +81,94 @@ class Digrafo:
         return self.max_d
     
     def bfs(self, v):
-        visitado = {x: False for x in self.digrafo}
-        distancia = {x: float('inf') for x in self.digrafo}
-        predecessor = {x: None for x in self.digrafo}
+        if v not in self.digrafo:
+            print("Vértice não encontrado no digrafo.")
+            return None
 
-        fila = deque()
-        fila.append(v)
-        visitado[v] = True
-        distancia[v] = 0
+        d = {vertice: float('inf') for vertice in self.digrafo}
+        pi = {vertice: None for vertice in self.digrafo}
+        d[v] = 0
+        fila = deque([v])
 
         while fila:
-            vertice = fila.popleft()
-            for vizinho in self.digrafo[vertice]:
-                if not visitado[vizinho]:
+            atual = fila.popleft()
+            for vizinho in self.digrafo[atual]:
+                if d[vizinho] == float('inf'):
+                    d[vizinho] = d[atual] + 1
+                    pi[vizinho] = atual
                     fila.append(vizinho)
-                    visitado[vizinho] = True
-                    distancia[vizinho] = distancia[vertice] + 1
-                    predecessor[vizinho] = vertice
 
-        # Filtrar os resultados infinito e None
-        distancia = {k: v for k, v in distancia.items() if v != float('inf')}
-        predecessor = {k: v for k, v in predecessor.items() if v is not None}
+        return d, pi
 
-        return distancia, predecessor
+    def dfs(self, vertice):
+        pi = {v: None for v in self.digrafo}
+        v_ini = {v: None for v in self.digrafo}
+        v_fim = {v: None for v in self.digrafo}
+        tempo = 0
 
-    def dfs(self, v):
-        visitado = {x: False for x in self.digrafo}
-        predecessor = {x: None for x in self.digrafo}
-        tempo_inicio = {x: None for x in self.digrafo}
-        tempo_fim = {x: None for x in self.digrafo}
+        stack = [vertice]
 
-        tempo = [0]  # Usamos uma lista para que o valor seja passado por referência
+        while stack:
+            u = stack[-1]
 
-        def dfs_visit(vertice):
-            visitado[vertice] = True
-            tempo[0] += 1
-            tempo_inicio[vertice] = tempo[0]
+            if v_ini[u] is None:
+                tempo += 1
+                v_ini[u] = tempo
 
-            for vizinho in self.digrafo[vertice]:
-                if not visitado[vizinho]:
-                    predecessor[vizinho] = vertice
-                    dfs_visit(vizinho)
+            vizinho_encontrado = False
+            for v in self.digrafo[u]:
+                if v_ini[v] is None:
+                    pi[v] = u
+                    stack.append(v)
+                    vizinho_encontrado = True
+                    break
 
-            tempo[0] += 1
-            tempo_fim[vertice] = tempo[0]
+            if not vizinho_encontrado:
+                stack.pop()
+                tempo += 1
+                v_fim[u] = tempo
 
-        dfs_visit(v)
-
-        # Filtrar os resultados None
-        predecessor = {k: v for k, v in predecessor.items() if v is not None}
-        tempo_inicio = {k: v for k, v in tempo_inicio.items() if v is not None}
-        tempo_fim = {k: v for k, v in tempo_fim.items() if v is not None}
-
-        return predecessor, tempo_inicio, tempo_fim
+        return pi, v_ini, v_fim
 
     def bellman_ford(self, v):
-        distancia = {x: float('inf') for x in self.digrafo}
-        predecessor = {x: None for x in self.digrafo}
-
-        distancia[v] = 0
+        d = {vertice: float('inf') for vertice in self.digrafo}
+        pi = {vertice: None for vertice in self.digrafo}
+        d[v] = 0
 
         for _ in range(len(self.digrafo) - 1):
-            for vertice in self.digrafo:
-                for vizinho, (peso, _) in self.digrafo[vertice].items():
-                    if distancia[vertice] + peso < distancia[vizinho]:
-                        distancia[vizinho] = distancia[vertice] + peso
-                        predecessor[vizinho] = vertice
+            for origem in self.digrafo:
+                for destino in self.digrafo[origem]:
+                    if d[origem] + self.digrafo[origem][destino][0] < d[destino]:
+                        d[destino] = d[origem] + self.digrafo[origem][destino][0]
+                        pi[destino] = origem
 
-        for vertice in self.digrafo:
-            for vizinho, (peso, _) in self.digrafo[vertice].items():
-                if distancia[vertice] + peso < distancia[vizinho]:
-                    print("O digrafo contém um ciclo de peso negativo")
-                    return None, None
+        for origem in self.digrafo:
+            for destino in self.digrafo[origem]:
+                if d[origem] + self.digrafo[origem][destino][0] < d[destino]:
+                    raise ValueError("O digrafo contém um ciclo negativo")
 
-        # Filtrar os resultados infinito e None
-        distancia = {k: v for k, v in distancia.items() if v != float('inf')}
-        predecessor = {k: v for k, v in predecessor.items() if v is not None}
+        return d, pi
 
-        return distancia, predecessor
+    def dijkstra(self, origem):
+        distancias = {v: float('inf') for v in self.digrafo}
+        predecessores = {v: None for v in self.digrafo}
+        distancias[origem] = 0
 
-    def dijkstra(self, v):
-        distancia = {x: float('inf') for x in self.digrafo}
-        predecessor = {x: None for x in self.digrafo}
+        heap = [(0, origem)]
 
-        distancia[v] = 0
-        fila_prioridade = [(0, v)]
+        while heap:
+            dist_u, u = heapq.heappop(heap)
 
-        while fila_prioridade:
-            dist, vertice = heapq.heappop(fila_prioridade)
-            if dist != distancia[vertice]:
+            if dist_u > distancias[u]:
                 continue
-            for vizinho, (peso, _) in self.digrafo[vertice].items():
-                distancia_alternativa = distancia[vertice] + peso
-                if distancia_alternativa < distancia[vizinho]:
-                    distancia[vizinho] = distancia_alternativa
-                    predecessor[vizinho] = vertice
-                    heapq.heappush(fila_prioridade, (distancia_alternativa, vizinho))
 
-        # Filtrar os resultados infinito e None
-        distancia = {k: v for k, v in distancia.items() if v != float('inf')}
-        predecessor = {k: v for k, v in predecessor.items() if v is not None}
+            for v in self.digrafo[u]:
+                peso_uv, _ = self.digrafo[u][v]
+                dist_v = distancias[u] + peso_uv
 
-        return distancia, predecessor
+                if dist_v < distancias[v]:
+                    distancias[v] = dist_v
+                    predecessores[v] = u
+                    heapq.heappush(heap, (dist_v, v))
+
+        return distancias, predecessores
