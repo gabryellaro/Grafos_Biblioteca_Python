@@ -157,9 +157,6 @@ def testes(d):
     print(f'd) Ciclo com uma quantidade de arestas maior ou igual a 5: {ciclo_5}')
 
     # e) Calcula e imprime o vértice mais distante do vértice 129 e a distância entre eles usando Dijkstra
-    print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
-    print("Aguarde o fim dos testes, pode demorar um tempo...")
-    print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
     distancias_129, predecessores = d.dijkstra("129")
 
     # Filtra vértices alcançáveis (distância diferente de infinito)
