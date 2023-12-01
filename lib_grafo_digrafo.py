@@ -1,7 +1,12 @@
-from grafo import *
-from digrafo import *     
+from grafo import * #importa a classe grafo
+from digrafo import * #importa a classe digrafo
 
 def menu_grafo(g):
+    '''
+    Implementa um menu interativo para operações em um grafo não direcionado.
+    Permite ao usuário escolher entre diversas operações, como adicionar aresta, calcular graus,
+    executar algoritmos de busca, entre outros.
+    '''
     while True:
         print("==========================")
         print("1.Adicionar arco")
@@ -26,7 +31,7 @@ def menu_grafo(g):
             origem = input("Digite o vértice de origem: ")
             destino = input("Digite o vértice de destino: ")
             peso = input("Digite o peso da aresta: ")
-            g.adicionar_arco(origem, destino, peso)
+            g.adicionar_aresta(origem, destino, peso)
         elif opcao=='2':
             print(g.num_vertices())
         elif opcao=='3':
@@ -62,6 +67,11 @@ def menu_grafo(g):
             print("Opção Inválida!")
 
 def menu_digrafo(d):
+    '''
+    Implementa um menu interativo para operações em um digrafo direcionado.
+    Permite ao usuário escolher entre diversas operações, como adicionar arco, calcular graus,
+    executar algoritmos de busca, entre outros.
+    '''
     while True:
         print("==========================")
         print("1.Adicionar arco")
@@ -121,38 +131,46 @@ def menu_digrafo(d):
         else:
             print("Opção Inválida!")
 
-
-#ta com erro
 def testes(d):
-        # a) Valor de G.mind
-        mind = d.menor_grau()
-        print(f'a) Valor de G.mind: {mind}')
+    # a) Calcula e imprime o menor grau do digrafo
+    mind = d.menor_grau()
+    print(f'a) Valor de G.mind: {mind}')
 
-        # b) Valor de G.maxd
-        maxd = d.maior_grau()
-        print(f'b) Valor de G.maxd: {maxd}')
+    # b) Calcula e imprime o maior grau do digrafo
+    maxd = d.maior_grau()
+    print(f'b) Valor de G.maxd: {maxd}')
 
-        # c) Caminho com uma quantidade de arestas maior ou igual a 10
-        caminho_10 = None
-        for vertice in d.digrafo:
-            if d.grau_vertice(vertice) >= 10:
-                caminho_10 = d.bfs(vertice)
-                break
-        print(f'c) Caminho com uma quantidade de arestas maior ou igual a 10: {caminho_10}')
+    # c) Encontra e imprime um caminho BFS a partir de um vértice com grau maior ou igual a 10
+    caminho_10 = None
+    for vertice in d.digrafo:
+        if d.grau_vertice(vertice) >= 10:
+            caminho_10 = d.bfs(vertice)
+            break
+    print(f'c) Caminho com uma quantidade de arestas maior ou igual a 10: {caminho_10}')
 
-        # d) Ciclo com uma quantidade de arestas maior ou igual a 5
-        ciclo_5 = None
-        for vertice in d.digrafo:
-            if d.grau_vertice(vertice) >= 5:
-                ciclo_5 = d.dfs(vertice)
-                break
-        print(f'd) Ciclo com uma quantidade de arestas maior ou igual a 5: {ciclo_5}')
+    # d) Encontra e imprime um ciclo DFS a partir de um vértice com grau maior ou igual a 5
+    ciclo_5 = None
+    for vertice in d.digrafo:
+        if d.grau_vertice(vertice) >= 5:
+            ciclo_5 = d.dfs(vertice)
+            break
+    print(f'd) Ciclo com uma quantidade de arestas maior ou igual a 5: {ciclo_5}')
 
-        # e) Vértice mais distante do vértice 129 e a distância entre eles
-        print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
-        print("Aguarde o fim dos testes, pode demorar um tempo...")
-        print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
-        distancias_129, _ = d.dijkstra(129)
-        vertice_distante = max(distancias_129, key=distancias_129.get)
-        distancia_vertice_distante = distancias_129[vertice_distante]
-        print(f'e) Vértice mais distante do vértice 129: {vertice_distante}, Distância: {distancia_vertice_distante}')
+    # e) Calcula e imprime o vértice mais distante do vértice 129 e a distância entre eles usando Dijkstra
+    print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+    print("Aguarde o fim dos testes, pode demorar um tempo...")
+    print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+    distancias_129, predecessores = d.dijkstra("129")
+
+    # Filtra vértices alcançáveis (distância diferente de infinito)
+    vertices_alcancaveis = [vertice for vertice, distancia in distancias_129.items() if distancia != float('inf')]
+    predecessores_alcancaveis = {vertice: predecessores[vertice] for vertice in vertices_alcancaveis}
+
+    # Encontra o vértice mais distante e calcula a quantidade de arestas no caminho
+    vertice_mais_distante = max(predecessores_alcancaveis, key=lambda v: distancias_129[v])
+    quantidade_arestas = 0
+    atual = vertice_mais_distante
+    while atual is not None:
+        quantidade_arestas += 1
+        atual = predecessores[atual]
+    print(f"e) Vértice mais distante de 129: {vertice_mais_distante}, Distância: {quantidade_arestas}.")
