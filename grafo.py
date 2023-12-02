@@ -77,8 +77,8 @@ class Grafo:
             print("Vértice não encontrado no grafo.")
             return None
 
-        d = {vertice: float('inf') for vertice in self.grafo}
-        pi = {vertice: None for vertice in self.grafo}
+        d = {v: float('inf') for v in self.grafo}
+        pi = {v: None for v in self.grafo}
         d[v] = 0
         fila = deque([v])
 
@@ -92,7 +92,7 @@ class Grafo:
 
         return d, pi
     
-    def dfs(self, vertice):
+    def dfs(self, v):
         '''
         Executa a busca em profundidade a partir do vértice fornecido no grafo.
         Retorna predecessores, tempos de início e fim da visita aos vértices.
@@ -102,7 +102,7 @@ class Grafo:
         v_fim = {v: None for v in self.grafo}
         tempo = 0
 
-        stack = [vertice]
+        stack = [v]
 
         while stack:
             u = stack[-1]
@@ -131,8 +131,8 @@ class Grafo:
         Executa o algoritmo de Bellman-Ford a partir do vértice fornecido no grafo.
         Retorna distâncias e predecessores; lança uma exceção se houver ciclo negativo.
         '''
-        d = {vertice: float('inf') for vertice in self.grafo}
-        pi = {vertice: None for vertice in self.grafo}
+        d = {v: float('inf') for v in self.grafo}
+        pi = {v: None for v in self.grafo}
         d[v] = 0
 
         for _ in range(len(self.grafo) - 1):

@@ -107,40 +107,45 @@ class Digrafo:
 
         return d, pi
     
-    def dfs(self, vertice):
-        '''
-        Executa a busca em profundidade a partir do vértice fornecido no digrafo.
-        Retorna predecessores, tempos de início e fim da visita aos vértices.
-        '''
-        pi = {v: None for v in self.digrafo}
-        v_ini = {v: None for v in self.digrafo}
-        v_fim = {v: None for v in self.digrafo}
-        tempo = 0
+    def dfs_visita(self, v, visitado):
+        visitado[v] = True
+        self.tempo += 1
+        self.v_ini[v] = self.tempo
+        for i in range(self.V):
+            if self.grafo[v][i] > 0 and visitado[i] == False:
+                self.pi[i] = v
+                self.DFS_visita(i, visitado)
+        self.tempo += 1
+        self.v_fim[v] = self.tempo
 
-        stack = [vertice]
+    def dfs(self, v):
+        visitado = [False]*self.V
+        self.DFS_visita(v, visitado)
+        return self.pi, self.v_ini, self.v_fim
 
-        while stack:
-            u = stack[-1]
+    def ciclo_5(self, v):
+        self.visitado = {i: False for i in self.digrafo.keys()}
+        self.rec_stack = {i: False for i in self.digrafo.keys()}
+        self.ciclo = []
+        return self.ciclo_5_util(v)
 
-            if v_ini[u] is None:
-                tempo += 1
-                v_ini[u] = tempo
-
-            vizinho_encontrado = False
-            for v in self.digrafo[u]:
-                if v_ini[v] is None:
-                    pi[v] = u
-                    stack.append(v)
-                    vizinho_encontrado = True
-                    break
-
-            if not vizinho_encontrado:
-                stack.pop()
-                tempo += 1
-                v_fim[u] = tempo
-
-        return pi, v_ini, v_fim
-
+    def ciclo_5_util(self, v):
+        self.visitado[v] = True
+        self.rec_stack[v] = True
+        self.ciclo.append(v)
+        for vizinho in self.digrafo[v]:
+            if self.visitado[vizinho] == False:
+                ciclo = self.ciclo_5_util(vizinho)
+                if ciclo is not None:
+                    return ciclo
+            elif self.rec_stack[vizinho] == True and len(self.ciclo) >= 5:
+                self.ciclo.append(vizinho)
+                return self.ciclo
+        self.rec_stack[v] = False
+        if self.ciclo and self.ciclo[-1] == v:
+            self.ciclo.pop()
+        return None
+    
     def bellman_ford(self, v):
         '''
         Executa o algoritmo de Bellman-Ford a partir do vértice fornecido no digrafo.

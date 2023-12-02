@@ -12,8 +12,8 @@ def menu_grafo(g):
         print("1.Adicionar arco")
         print("2.N° de vertices")
         print("3.N° de arestas")
-        print("4.Vizinhanca de um vertice")
-        print("5.Grau de um vertice")
+        print("4.Vizinhanca de um v")
+        print("5.Grau de um v")
         print("6.Peso de uma aresta")
         print("7.Menor grau")
         print("8.Maior grau")
@@ -77,8 +77,8 @@ def menu_digrafo(d):
         print("1.Adicionar arco")
         print("2.N° de vertices")
         print("3.N° de arestas")
-        print("4.Vizinhanca de um vertice")
-        print("5.Grau de um vertice")
+        print("4.Vizinhanca de um v")
+        print("5.Grau de um v")
         print("6.Peso de uma aresta")
         print("7.Menor grau")
         print("8.Maior grau")
@@ -93,8 +93,8 @@ def menu_digrafo(d):
         if opcao=='0':
             break
         elif opcao=='1':
-            origem = input("Digite o vertice de origem: ")
-            destino = input("Digite o vertice de destino: ")
+            origem = input("Digite o v de origem: ")
+            destino = input("Digite o v de destino: ")
             peso = input("Digite o peso da aresta: ")
             d.adicionar_arco(origem, destino, peso)
         elif opcao=='2':
@@ -132,42 +132,53 @@ def menu_digrafo(d):
             print("Opção Inválida!")
 
 def testes(d):
-    # a) Calcula e imprime o menor grau do digrafo
-    mind = d.menor_grau()
-    print(f'a) Valor de G.mind: {mind}')
+    # Caso de Teste a) O valor de G.mind
+    print("a) O valor de G.min_d:", d.menor_grau())
 
-    # b) Calcula e imprime o maior grau do digrafo
-    maxd = d.maior_grau()
-    print(f'b) Valor de G.maxd: {maxd}')
+    # Caso de Teste b) O valor de G.maxd
+    print("b) O valor de G.max_d:", d.maior_grau())
 
-    # c) Encontra e imprime um caminho BFS a partir de um vértice com grau maior ou igual a 10
-    caminho_10 = None
-    for vertice in d.digrafo:
-        if d.grau_vertice(vertice) >= 10:
-            caminho_10 = d.bfs(vertice)
+    # Caso de Teste c) Um caminho com uma qtde. de arestas maior ou igual a 10
+    caminho_com_10_arestas = None
+
+    for vertice_inicial in d.digrafo:
+        distancias, predecessores = d.bfs(vertice_inicial)
+
+        # Encontrar um caminho com pelo menos 10 arestas
+        for v, predecessor in predecessores.items():
+            if predecessor is not None and distancias[v] >= 10:
+                caminho_com_10_arestas = [v]
+                while predecessor is not None:
+                    caminho_com_10_arestas.insert(0, predecessor)
+                    predecessor = predecessores[predecessor]
+                break
+
+        if caminho_com_10_arestas:
             break
-    print(f'c) Caminho com uma quantidade de arestas maior ou igual a 10: {caminho_10}')
 
-    # d) Encontra e imprime um ciclo DFS a partir de um vértice com grau maior ou igual a 5
-    ciclo_5 = None
-    for vertice in d.digrafo:
-        if d.grau_vertice(vertice) >= 5:
-            ciclo_5 = d.dfs(vertice)
-            break
-    print(f'd) Ciclo com uma quantidade de arestas maior ou igual a 5: {ciclo_5}')
+    if caminho_com_10_arestas:
+        print("c) Caminho com pelo menos 10 arestas:", caminho_com_10_arestas)
+    else:
+        print("c) Nenhum caminho com pelo menos 10 arestas encontrado.")
 
-    # e) Calcula e imprime o vértice mais distante do vértice 129 e a distância entre eles usando Dijkstra
-    distancias_129, predecessores = d.dijkstra("129")
+    # Caso de Teste d) Um ciclo com uma qtde. de arestas maior ou igual a 5
+    for v in d.digrafo:
+        ciclo=d.ciclo_5(v)
+        if ciclo is not None:
+           print("d) Ciclo com pelo menos 5 arestas:",ciclo)
+           break
+        else:
+            print("c) Nenhum  Ciclo com pelo menos 5 arestas encontrado.")
+        
 
-    # Filtra vértices alcançáveis (distância diferente de infinito)
-    vertices_alcancaveis = [vertice for vertice, distancia in distancias_129.items() if distancia != float('inf')]
-    predecessores_alcancaveis = {vertice: predecessores[vertice] for vertice in vertices_alcancaveis}
 
-    # Encontra o vértice mais distante e calcula a quantidade de arestas no caminho
-    vertice_mais_distante = max(predecessores_alcancaveis, key=lambda v: distancias_129[v])
-    quantidade_arestas = 0
-    atual = vertice_mais_distante
-    while atual is not None:
-        quantidade_arestas += 1
-        atual = predecessores[atual]
-    print(f"e) Vértice mais distante de 129: {vertice_mais_distante}, Distância: {quantidade_arestas}.")
+
+
+    # Caso de Teste e) O vértice mais distante do vértice 129 e o valor da distância
+    distancias, _ = d.dijkstra("129")
+
+    vertice_mais_distante = max(distancias, key=distancias.get)
+    distancia_mais_distante = distancias[vertice_mais_distante]
+
+    print("e) Vértice mais distante de 5:", vertice_mais_distante)
+    print("   Distância entre eles:", distancia_mais_distante)
