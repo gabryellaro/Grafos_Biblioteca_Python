@@ -169,10 +169,6 @@ def testes(d):
            break
         else:
             print("c) Nenhum  Ciclo com pelo menos 5 arestas encontrado.")
-        
-
-
-
 
     # Caso de Teste e) O vértice mais distante do vértice 129 e o valor da distância
     distancias, _ = d.dijkstra("129")
@@ -180,5 +176,4 @@ def testes(d):
     vertice_mais_distante = max(distancias, key=distancias.get)
     distancia_mais_distante = distancias[vertice_mais_distante]
 
-    print("e) Vértice mais distante de 5:", vertice_mais_distante)
-    print("   Distância entre eles:", distancia_mais_distante)
+    print("e) Vértice mais distante de 129 é", vertice_mais_distante,"e a distância entre eles é",distancia_mais_distante)
